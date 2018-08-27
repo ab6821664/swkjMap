@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.quadrat.QuadratMapper">
+    <!--一对一关系的查询-->
+    <resultMap id="dratMapper" type="com.swkj.mapdisplay.enitiy.QuadratData">
+        <id column="QuadratID" property="quadratid" javaType="java.lang.Integer"></id>
+        <result column="QuadratDataCode" property="quadratdatacode"></result>
+        <result column="QuadratDataName" property="quadratdataname"></result>
+        <result column="Invester" property="invester"></result>
+        <result column="InvesterDate" property="investerdate" javaType="java.util.Date"></result>
+        <result column="SoilCode" property="soilcode"></result>
+        <result column="Gradient" property="gradient"></result>
+        <result column="Aspect" property="aspect"></result>
+        <result column="Altitude" property="altitude"></result>
+        <result column="Area" property="area"></result>
+        <result column="Address" property="address"></result>
+        <result column="HumusSpy" property="humusspy"></result>
+        <result column="Lat" property="lat"></result>
+        <result column="Lng" property="lng"></result>
+        <collection property="quadratDataSub" ofType="com.swkj.mapdisplay.enitiy.QuadratDataSub">
+            <!--<id column="" property="SubID"></id>-->
+            <!--<id column="QuadratID" property="quadratid" javaType="java.lang.Integer"></id>-->
+            <result column="SubID" property="subid"></result>
+            <result column="QuadratID" property="quadratid"></result>
+           <result column="Parameter1" property="parameter1"></result>
+            <result column="Parameter2" property="parameter2"></result>
+            <result column="Parameter3" property="parameter3"></result>
+            <result column="Parameter4" property="parameter4"></result>
+            <result column="HealthState" property="healthstate"></result>
+            <result column="Remark" property="remark"></result>
+        </collection>
+    </resultMap>
+    <resultMap id="selectMapper" type="java.util.Map">
+      <result property="InvesterDate" column="InvesterDate" javaType="java.util.Date"></result>
+        <result property="CreationDate" column="CreationDate" javaType="java.util.Date"></result>
+        <result property="LastUpdateDate" column="LastUpdateDate" javaType="java.util.Date"></result>
+    </resultMap>
+    <!--BHQ_QuadratDataList表的信息-->
+    <resultMap id="dataListMapper" type="java.util.Map">
+        <result property="ISID" column="ISID" javaType="java.lang.Integer"></result>
+        <result property="ListID" column="ListID" javaType="java.lang.Integer"></result>
+        <result property="QuadratID" column="QuadratID" javaType="java.lang.Integer"></result>
+        <result property="Lng" column="Lng" javaType="java.lang.String"></result>
+        <result property="Lat" column="Lat" javaType="java.lang.String"></result>
+        <result property="CoordinateTime" column="CoordinateTime" javaType="java.util.Date"></result>
+    </resultMap>
+    <!--返回QuadratDataCode和QuadratID的值-->
+    <select id="getDataSN" parameterType="java.util.Map" resultType="java.lang.String">
+      exec sp_sys_GetDataSN #{DataCode},#{Code}
+     </select>
+    <!--查询样地表-->
+    <select id="selectDataSub" resultMap="dratMapper">
+  select d.QuadratID,d.QuadratDataCode, d.QuadratDataName,d.Invester,
+d.InvesterDate,d.SoilCode,d.Gradient,d.Aspect,
+d.Altitude,d.Area,d.Address,d.HumusSpy,d.Lat,d.Lng,s.QuadratID as quadratID,s.SubID,s.Parameter1,s.Parameter2,
+s.Parameter3,s.Parameter4,s.HealthState,s.Remark
+from BHQ_QuadratData AS d inner join BHQ_QuadratDataSub AS s
+on d.QuadratID=s.QuadratID where d.QuadratID=#{quadratID}
+    </select>
+    <!--增加主表BHQ_QuadratData的信息返回QuadratID给页面-->
+    <insert id="addQuadratData" parameterType="java.util.Map">
+        insert into BHQ_QuadratData(QuadratID,NativeCode,QuadratDataCode,QuadratDataName,Lat,Lng,Gradient,Aspect,Altitude,Area,
+        Address,SoilCode,HumusSpy,Invester,InvesterDate,CreatedBy,CreationDate,LastUpdatedBy,LastUpdateDate)
+        values(#{QuadratID},'43007',#{QuadratDataCode},#{quadratdataname},#{lat},#{lng},#{gradient},#{aspect},#{altitude},#{area},
+        #{address},#{soilcode},#{humusspy},#{invester},#{investerdate},#{createdby},#{creationdate},
+        #{lastupdatedby},#{lastupdatedate})
+    </insert>
+    <!--增加位置表 BHQ_QuadratDataList 信息-->
+    <insert id="addQuadratDataList" parameterType="java.util.Map">
+        insert into BHQ_QuadratDataList
+        (ListID,QuadratID,Lng,Lat,CoordinateTime)
+        values
+        <foreach collection="map" item="values" index="key" separator="," open="(" close=")">
+            #{values}
+        </foreach>
+    </insert>
+    <!--增加子表 BHQ_QuadratDataSub的信息-->
+    <insert id="addQuadratDataSub" parameterType="java.util.Map">
+        insert into BHQ_QuadratDataSub
+        (BotanyCode,Parameter1,Parameter2,Parameter3,Parameter4,Healthstate,Remark,QuadratID,SubID)
+        values
+        <foreach collection="map" item="values" index="key" separator="," open="(" close=")">
+            #{values}
+        </foreach>
+    </insert>
+    <!--修改样地属性信息-->
+    <update id="updateQuadratData" parameterType="java.util.Map">
+      update BHQ_QuadratData
+      <set>
+          <if test="quadratdataname !=null and quadratdataname!=''">
+              QuadratDataName=#{quadratdataname},
+          </if>
+          <if test="gradient !=null and gradient !=''">
+              Gradient=#{gradient},
+          </if>
+          <if test="aspect !=null and aspect !=''">
+              Aspect=#{aspect},
+          </if>
+          <if test="altitude !=null and altitude !=''">
+              Altitude=#{altitude},
+          </if>
+          <if test="area !=null and area !=''">
+              Area=#{area},
+          </if>
+          <if test="address !=null and address !=''">
+              Address=#{address},
+          </if>
+          <if test="soilcode !=null and soilcode !=''">
+              SoilCode=#{soilcode},
+          </if>
+          <if test="humusspy !=null and humusspy !=''">
+              HumusSpy=#{humusspy},
+          </if>
+          <if test="invester !=null and invester !=''">
+              Invester=#{invester},
+          </if>
+          <if test="investerdate !=null and investerdate !=''">
+              InvesterDate=#{Investerdate},
+          </if>
+          <if test="createdby !=null and createdby !=''">
+              CreatedBy=#{createdby},
+          </if>
+          <if test="creationdate !=null and creationdate !=''">
+              CreationDate=#{creationdate},
+          </if>
+          <if test="lastupdatedby !=null and lastupdatedby !=''">
+              LastUpdatedBy=#{lastupdatedby},
+          </if>
+          <if test="lastupdatedate !=null and lastupdatedate !=''">
+              LastUpdateDate=#{lastupdatedate},
+          </if>
+      </set>
+         where QuadratID=#{quadratid}
+    </update>
+    <!--修改样地植物信息-->
+    <update id="updateQuadratDataSub" parameterType="java.util.Map">
+       update BHQ_QuadratDataSub
+       <set>
+           <if test="parameter1 !=null and parameter1!=''">
+               Parameter1=#{parameter1},
+           </if>
+           <if test="parameter2 !=null and parameter2!=''">
+               Parameter2=#{parameter2},
+           </if>
+           <if test="parameter3 !=null and parameter3!=''">
+               Parameter3=#{parameter3},
+           </if>
+           <if test="parameter4 !=null and parameter4!=''">
+               Parameter4=#{parameter4},
+           </if>
+           <if test="healthstate !=null and healthstate!=''">
+               HealthState=#{healthstate},
+           </if>
+           <if test="remark!=null and remark!=''">
+               Remark=#{remark},
+           </if>
+       </set>
+         where QuadratID=#{quadratid} and SubID=#{subid}
+    </update>
+    <!--删除样地属性信息-->
+    <delete id="deleteQuadratData">
+        delete from dbo.BHQ_QuadratData where QuadratID=#{QuadratID}
+    </delete>
+    <!--删除样地植物属性信息-->
+    <delete id="deleteQuadratDataSub">
+        delete from dbo.BHQ_QuadratDataSub where QuadratID=#{QuadratID}
+    </delete>
+    <!--加载植物名称的代号信息-->
+    <select id="dictIfon" resultType="java.util.Map">
+       select id,name from dbo.PT_BaseDict where type =85
+    </select>
+</mapper>

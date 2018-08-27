@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.loginmapper.LoginMapper">
+    <select id="Long" resultType="com.swkj.mapdisplay.enitiy.Boundary">
+        select BoundaryID from BHQ_Boundary where  LocationName=#{LocationName}
+    </select>
+</mapper>

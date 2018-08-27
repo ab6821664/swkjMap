@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.appendmapper.BoundaryPostMapper">
+    <!--查询出界牌界碑和牌栏的id-->
+    <select id="BoundaId" parameterType="java.util.Map" resultType="java.lang.String">
+      exec dbo.sp_GetDataSN #{DataCode},#{AsHeader}
+     </select>
+    <!--增加界牌界碑的信息-->
+    <insert id="raiseBoundary" parameterType="java.util.Map">
+    insert into BHQ_Boundary(BHQID,BoundaryID,LocationName,BoundaryName,Lat,Lng,Model,Publishdate,Content,BioImageId,CreationDate,CreatedBy,LastUpdateDate,
+      LastUpdatedBy,NativeCode)
+      values(#{BHQID},#{BoundaryID},#{Boundary.LocationName},#{Boundary.BoundaryName},#{Boundary.Lat},#{Boundary.Lng},#{Boundary.Model},#{Boundary.Publishdate},#{Boundary.Content},#{Boundary.BioImageId},#{Boundary.CreationDate},#{Boundary.CreatedBy},#{Boundary.LastUpdateDate},#{Boundary.LastUpdatedBy},#{Boundary.NativeCode})
+    </insert>
+     <!--增加牌栏信息-->
+    <insert id="raiseBotany" parameterType="java.util.Map">
+      insert into BHQ_Brand(BHQID,BrandID,LocationName,SortName,Qty,Lat,Lng,Model,Publisher,Sizes,Publishdate,Content,PersonLiable,BioImageId,
+      CreationDate,CreatedBy,LastUpdateDate,LastUpdatedBy,NativeCode,BrandName)
+      values(#{BHQID},#{BrandID},#{Botany.LocationName},#{Botany.SortName},#{Botany.Qty},#{Botany.Lat},#{Botany.Lng},#{Botany.Model},#{Botany.Publisher},#{Botany.Sizes},#{Botany.Publishdate},#{Botany.Content},#{Botany.PersonLiable},#{Botany.BioImageId},#{Botany.CreationDate},#{Botany.CreatedBy},#{Botany.LastUpdateDate},#{Botany.LastUpdatedBy},#{Botany.NativeCode},#{Botany.BrandName})
+    </insert>
+    <!--增加生境信息-->
+    <insert id="raiseSjyz" parameterType="java.util.Map">
+    insert into dbo.BHQ_SpreadHabitatSub(SPID,PatrolId,SortCode,ParamsCode,ParamsValue,PatrolMedioId)
+    values(#{SPID},#{PatrolId},'SJYZ','PlantType',#{plantType},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'SJYZ','Terrain',#{terrain},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','CoverPorosity',#{coverPorosity},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','CoverStructural',#{coverStructural},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','CoverColloid',#{coverColloid},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'SJYZ','SlopeId',#{slopeId},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','HabitatId',#{habitatId},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','Altitude',#{altitude},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','LocationId',#{locationId},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'SJYZ','CovertType',#{covertType},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'SJYZ','lat',#{lat},#{PatrolMedioId}),(#{SPID},#{PatrolId},'SJYZ','lng',#{lng},#{PatrolMedioId})
+    </insert>
+    <!--向与生境信息关联的表BHQ_Sm_Relation中添加相应的信息-->
+    <insert id="addRelation" parameterType="java.util.Map">
+        insert into BHQ_Sm_Relation(SPID,PatrolId,PatrolSubId,SmId,CreateTime)
+        values(#{SPID},#{PatrolId},0,#{SmId},#{CreateTime})
+    </insert>
+    <!--查询生境信息的范围-->
+    <select id="range" resultType="String" parameterType="java.util.Map">
+        select SmId from dbo.BHQ_Sm_PatchesCoordinate
+        where
+        SmSdriW &lt;=#{lng} AND
+        SmSdriE &gt;=#{lng} AND
+        SmSdriS &lt;=#{lat} AND
+        SmSdriN &gt;=#{lat}
+    </select>
+</mapper>

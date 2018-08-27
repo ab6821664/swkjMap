@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.deleteLivestock.DropSpreadSubMapper">
+  <!--删除植物和动物信息-->
+ <delete id="dropAnimal">
+     delete  from dbo.BHQ_SpreadSub where SPID=#{SPID}
+AND PatrolSubId=#{PatrolSubId}
+ </delete>
+  <!--删除界桩界碑信息-->
+    <delete id="dropBoundary">
+      delete from BHQ_Boundary where BoundaryID=#{boundaryID}
+    </delete>
+   <!--删除牌栏信息-->
+    <delete id="dropBrand">
+     delete from BHQ_Brand where BrandID=#{brandID}
+    </delete>
+</mapper>

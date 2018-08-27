@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.telecamera.CameraMapper">
+    <resultMap id="BaseResultMap" type="java.util.Map" >
+        <constructor >
+            <idArg column="CameraId" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="CameraName" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="Provinceid" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="Cityid" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="CountryID" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="InstallPos" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="DeptId" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="InstallTime" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+            <arg column="RunState" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="Factory" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="SerialNo" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="IpAddress" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="UserName" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="UserPw" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="Port" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="Channel" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="OrderBy" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="type" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="ServerName" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="Lat" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="Lng" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="CDID" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="CameraStadia" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="CameraVariation" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="HeadVariation" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="IsVisible" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="ComIPAddress" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="VVariation" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
+            <arg column="IsJdhc" jdbcType="INTEGER" javaType="java.lang.Integer" />
+            <arg column="ServerIPAddress" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="ServerPort" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="nativeCode" jdbcType="VARCHAR" javaType="java.lang.String" />
+            <arg column="RtspPort" jdbcType="VARCHAR" javaType="java.lang.String" />
+        </constructor>
+    </resultMap>
+    <resultMap id="resMapper" type="java.util.Map">
+       <id column="CameraId" property="CameraId" javaType="java.lang.String"></id>
+        <result column="Lat" property="Lat" javaType="java.lang.Double"></result>
+        <result column="InstallTime" property="InstallTime" javaType="java.util.Date"></result>
+    </resultMap>
+         <!--查询摄像机-->
+         <select id="queryCamera" resultType="com.swkj.mapdisplay.enitiy.Camera">
+        select * from BHQ_Camera
+         <where>
+               <if test="CameraId !=null and CameraId!=''">
+                  CameraId=#{CameraId}
+               </if>
+         </where>
+         </select>
+    <parameterMap id="paraMapper" type="java.util.Map">
+        <parameter property="InstallTime" mode="IN" javaType="java.util.Date"></parameter>
+    </parameterMap>
+       <!--修改摄像机-->
+    <update id="updateCamera" parameterType="com.swkj.mapdisplay.enitiy.Camera">
+        update BHQ_Camera
+        <set>
+         <if test="CameraName !=null">
+             CameraName=#{CameraName},
+         </if>
+            <if test="Provinceid !=null">
+                Provinceid=#{Provinceid},
+            </if>
+            <if test="Cityid !=null">
+                Cityid=#{Cityid},
+            </if>
+            <if test="CountryID !=null">
+                CountryID=#{CountryID},
+            </if>
+            <if test="InstallPos !=null">
+                InstallPos=#{InstallPos},
+            </if>
+            <if test="DeptId !=null">
+                DeptId=#{DeptId},
+            </if>
+            <if test="InstallTime !=null">
+                InstallTime=#{InstallTime},
+            </if>
+            <if test="RunState !=null">
+                RunState=#{RunState},
+            </if>
+            <if test="Factory !=null">
+                Factory=#{Factory},
+            </if>
+            <if test="SerialNo !=null">
+                SerialNo=#{SerialNo},
+            </if>
+            <if test="IpAddress !=null">
+                IpAddress=#{IpAddress},
+            </if>
+            <if test="UserName !=null">
+                UserName=#{UserName},
+            </if>
+            <if test="UserPw !=null">
+                UserPw=#{UserPw},
+            </if>
+            <if test="Port !=null">
+                Port=#{Port},
+            </if>
+            <if test="Channel !=null">
+                Channel=#{Channel},
+            </if>
+            <if test="OrderBy !=null">
+                OrderBy=#{OrderBy},
+            </if>
+            <if test="type !=null">
+                type=#{type},
+            </if>
+            <if test="ServerName !=null">
+                ServerName=#{ServerName},
+            </if>
+            <if test="Lat !=null">
+                Lat=#{Lat},
+            </if>
+            <if test="Lng !=null">
+                Lng=#{Lng},
+            </if>
+            <if test="CDID !=null">
+                CDID=#{CDID},
+            </if>
+            <if test="CameraStadia !=null">
+                CameraStadia=#{CameraStadia},
+            </if>
+            <if test="CameraVariation !=null">
+                CameraVariation=#{CameraVariation},
+            </if>
+            <if test="HeadVariation !=null">
+                HeadVariation=#{HeadVariation},
+            </if>
+            <if test="IsVisible !=null">
+                IsVisible=#{IsVisible},
+            </if>
+            <if test="ComIPAddress !=null">
+                ComIPAddress=#{ComIPAddress},
+            </if>
+            <if test="VVariation !=null">
+                VVariation=#{VVariation},
+            </if>
+            <if test="IsJdhc !=null">
+                IsJdhc=#{IsJdhc},
+            </if>
+            <if test="ServerIPAddress !=null">
+                ServerIPAddress=#{ServerIPAddress},
+            </if>
+            <if test="ServerPort !=null">
+                ServerPort=#{ServerPort},
+            </if>
+            <if test="nativeCode !=null">
+                nativeCode=#{nativeCode},
+            </if>
+            <if test="RtspPort !=null">
+                RtspPort=#{RtspPort}
+            </if>
+          where CameraId=#{CameraId}
+       </set>
+    </update>
+    <!--增加摄像机信息-->
+    <select id="addCamera" resultType="java.lang.Integer"  parameterType="com.swkj.mapdisplay.enitiy.Camera">
+       insert into BHQ_Camera
+(CameraName,Provinceid,Cityid,CountryID,InstallPos,DeptId,InstallTime,RunState,
+Factory,SerialNo,IpAddress,UserName,UserPw,Port,Channel,OrderBy,type,ServerName,Lat,Lng,CDID,
+CameraStadia,
+CameraVariation,HeadVariation,IsVisible,ComIPAddress,VVariation,IsJdhc,ServerIPAddress,ServerPort,nativeCode,RtspPort) values(#{CameraName},#{Provinceid},#{Cityid},#{CountryID},#{InstallPos},#{DeptId},#{InstallTime},#{RunState},
+#{Factory},#{SerialNo},#{IpAddress},#{UserName},#{UserPw},#{Port},#{Channel},#{OrderBy},#{type},#{ServerName},#{Lat},#{Lng},#{CDID},
+#{CameraStadia},
+#{CameraVariation},#{HeadVariation},0,#{ComIPAddress},#{VVariation},0,'','',#{nativeCode},'')
+       ;SELECT @@Identity
+    </select>
+    <!--删除摄像机信息-->
+    <delete id="deleteCamera">
+         delete from BHQ_Camera
+         <where>
+             <if test="CameraId !=null">
+                 CameraId=#{CameraId}
+             </if>
+         </where>
+    </delete>
+    <!--加载摄像机下拉框里面的值-->
+    <select id="designCamera"  resultType="java.util.Map">
+         select id,name from dbo.PT_BaseDict
+        <where>
+         <if test="type!=null">
+             type=#{type}
+         </if>
+       </where>
+    </select>
+</mapper>

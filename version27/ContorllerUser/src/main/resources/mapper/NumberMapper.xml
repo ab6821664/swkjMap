@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.NumberMapper">
+    <resultMap id="numbermapper" type="com.swkj.mapdisplay.enitiy.SpreadFindQty">
+       <result column="GrowthState" property="GrowthState"></result>
+       <result column="MaleQty" property="MaleQty"></result>
+       <result column="FemaleQty" property="FemaleQty"></result>
+       <result column="TotalQty" property="TotalQty"></result>
+    </resultMap>
+    <!--查询动物信息的数量-->
+    <select id="getNumberqty" resultMap="numbermapper">
+select GrowthState,MaleQty,FemaleQty,TotalQty from dbo.BHQ_SpreadFindQty
+  <where>
+      <if test="SPID!=null and SPID!=''">
+       SPID=#{SPID}
+   AND PatrolId=#{PatrolId}
+      </if>
+    </where>
+    </select>
+</mapper>

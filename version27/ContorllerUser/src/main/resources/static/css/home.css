@@ -1,0 +1,209 @@
+*{
+    margin:0;
+    padding:0;
+}
+li{
+    list-style-type: none;
+}
+
+.fix-clear:after{
+    content:"";
+    display: block;
+    clear:both;
+    line-height: 0px;
+    visibility: hidden;
+}
+
+#menuShow{
+    background-color:white;
+    width:60px;
+    height:40px;
+}
+
+#viewDiv{
+    width:100%;
+    height:950px;
+    float:left;
+
+}
+/*   菜单样式  -------------------------------------------------------------  */
+#menContain{
+    background-color:white;
+    width:220px;
+
+}
+.menu-symbol{
+    margin-left:40px;
+}
+.menu-title{
+
+}
+.childMenu li{
+    float:left;
+    padding-left:10px;
+    padding-right:10px;
+
+}
+.childMenuActive{
+    background-color: rgba(74, 249, 241, 0.46);
+    color: rgba(56, 25, 22, 0.96);
+}
+
+.childMenu{
+    margin:0;
+
+}
+.menu-title h4{
+    line-height:40px;
+    vertical-align: center;
+}
+.controll{
+    width:220px;
+    position:absolute;
+    z-index:100;
+    background-color:white;
+    border-top:solid 1px grey;
+    display:none;
+    height:650px;
+    overflow:auto;
+}
+#controll{
+    display: block;
+}
+#toggle2D{
+    margin-left:35px;
+    margin-top:10px;
+}
+#toggle3D{
+    margin-left:35px;
+    margin-top:10px;
+}
+.choose-toggle3D{
+    font-size:19px;
+}
+.chooseShow{
+    width:88%;
+    height:40px;
+    background-color: rgba(69, 178, 60, 0.42);
+    font-size:18px;
+    margin-left:15px;
+}
+.itemShow{
+
+
+}
+.detail-table {
+    margin-left:10px;
+    width:80%;
+}
+.detail-table td{
+    margin-left:10px;
+}
+
+.lineLiatContain{
+    position:absolute;
+    z-index:100;
+    margin-left:20%;
+    margin-top:230px;
+    width:60%;
+    display: block;
+}
+
+#speed{
+    width:60%;
+    display: inline-block;
+}
+.speedSymbol{
+    margin-left:12%;
+}
+
+.measureMenu{
+    margin-left:50px;
+    margin-top:15px;
+
+}
+.measureResult{
+    color: #5e9eff;
+    font-size:18px;
+}
+#reset-measure{
+    text-align:center;
+}
+.locationInputed{
+    width:50px;
+}
+.tool-location{
+    margin-top:15px;
+}
+.show-patrol-msg td{
+    width:50%;
+}
+.yourclass{
+    width:632px!important;
+    height:450px;
+}
+.msgPopup{
+    width:100%;
+}
+.msgPopup td{
+    width:50%;
+
+}
+.msgValue{
+    float:right;
+    margin-right:35px;
+    width:140px;
+}
+#test{
+   display:none;
+}
+ .msgPopup{
+     margin-left:2px;
+     width:630px;
+
+ }
+.msgPopup tr{
+    border-bottom:solid 1px grey;
+    height:30px;
+    line-height: 30px;
+
+}
+.msgPopup td{
+    font-size:13px;
+    width:33%;
+    border-left:solid 2px grey;
+    padding-left:3px;
+}
+
+.attributeSection{
+    margin-top:20px;
+}
+.editSection{
+    margin-top:20px;
+}
+.editSection input{
+    margin-left:12%;
+    padding:10px 35px;
+}
+.popTemplate{
+   position:relative;
+    left:-500%;
+}
+.msgPopup input{
+    width:120px;
+    float:right;
+    margin-right:15px;
+
+}
+.toolSeparate{
+    margin-top:15px;
+    margin-bottom: 15px;
+}
+h5{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+
+
+

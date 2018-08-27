@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.DropBaseMapper">
+    <resultMap id="anminMapper" type="com.swkj.mapdisplay.enitiy.BaseDict">
+        <result property="id" column="id"></result>
+        <result property="name" column="name"></result>
+    </resultMap>
+     <!--查询动物下拉框信息-->
+    <select id="dropActionIfon" resultMap="anminMapper">
+       select id,name from dbo.PT_BaseDict where type
+  in(select Type from Sys_FieldParams where ParamsCode=#{acion})
+    </select>
+    <!--查询动物名字信息和AnimalCode-->
+    <select id="queryAnimalCode" resultType="java.util.Map">
+       select AnimalName,AnimalCode from BHQ_Animal_Basic
+    </select>
+    <!--查询植物名字信息和BotanyCode-->
+    <select id="queryBotanyCode" resultType="java.util.Map">
+      select BotanyName,BotanyCode from BHQ_Botany
+    </select>
+</mapper>

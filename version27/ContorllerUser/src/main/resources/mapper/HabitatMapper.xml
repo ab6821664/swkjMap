@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.HabitatMapper">
+     <!--查询生境信息的展示-->
+       <select id="queryHabitat" resultType="com.swkj.mapdisplay.enitiy.SpreadHabitatSub">
+Select SPID,PatrolId,PlantType,Terrain,CoverPorosity,CoverStructural,
+CoverColloid,SlopeId,HabitatId,Altitude,LocationId,CovertType,
+lat,lng from (select SPID,PatrolId,ParamsCode,ParamsValue from
+dbo.BHQ_SpreadHabitatSub where SPID=#{SPID}
+and PatrolId=#{PatrolId})
+AA PIVOT( MAX(ParamsValue) for ParamsCode in (PlantType,Terrain,
+CoverPorosity,CoverStructural,CoverColloid,SlopeId,HabitatId,
+Altitude,LocationId,CovertType,lat,lng)) as T
+       </select>
+    <!--查询生境信息中所有的代号-->
+    <select id="queryHabitatMark" resultType="com.swkj.mapdisplay.enitiy.SpreadHabitatsubMark">
+Select PlantType,Terrain,SlopeId,HabitatId,
+CovertType,coverColloid,coverPorosity,coverStructural from (select ParamsCode,ParamsValue from
+dbo.BHQ_SpreadHabitatSub where SPID=#{SPID}
+and PatrolId=#{PatrolId})
+AA PIVOT( MAX(ParamsValue) for ParamsCode in (PlantType,Terrain,SlopeId,HabitatId,
+CovertType,coverColloid,coverPorosity,coverStructural)) as T
+    </select>
+    <!--将生境信息中所有的代号转换成要输出的值-->
+    <select id="queryMarkValue" resultType="com.swkj.mapdisplay.enitiy.BaseDict" parameterType="com.swkj.mapdisplay.enitiy.SpreadHabitatsubMark">
+        select  id,name from dbo.PT_BaseDict
+        <where>
+            <if test="spreadHabitatsubMark!=null">
+                id in(#{spreadHabitatsubMark.PlantType},#{spreadHabitatsubMark.Terrain},#{spreadHabitatsubMark.SlopeId}
+                ,#{spreadHabitatsubMark.HabitatId},#{spreadHabitatsubMark.CovertType},#{spreadHabitatsubMark.coverColloid},
+                #{spreadHabitatsubMark.coverPorosity},#{spreadHabitatsubMark.coverStructural})
+            </if>
+        </where>
+    </select>
+    <!--利用坐标去查询生境信息-->
+    <select id="coordinateHabSub" resultType="com.swkj.mapdisplay.enitiy.SpreadHabitatSub">
+       select PlantType,Terrain,CoverPorosity,CoverStructural,CoverColloid,
+SlopeId,HabitatId,Altitude,LocationId,CovertType,lat,lng from
+(select ParamsCode,ParamsValue from dbo.BHQ_SpreadHabitatSub where
+SPID in (
+select SPID from BHQ_Sm_Relation where SmId in(select SmId from dbo.BHQ_Sm_PatchesCoordinate
+where SmSdriW &lt;=#{SmSdriw} AND SmSdriE &gt;=#{SmSdriw} AND SmSdriS &lt;=#{SmSdriN} AND SmSdriN &gt;=#{SmSdriN}))
+ and PatrolId in(select PatrolId from BHQ_Sm_Relation where SmId in (select SmId from dbo.BHQ_Sm_PatchesCoordinate
+where  SmSdriW &lt;=#{SmSdriw} AND SmSdriE &gt;=#{SmSdriw} AND SmSdriS &lt;=#{SmSdriN} AND SmSdriN &gt;=#{SmSdriN}))) AA PIVOT( MAX(ParamsValue) for ParamsCode in
+(PlantType,Terrain,CoverPorosity,CoverStructural,CoverColloid,SlopeId,HabitatId,Altitude,LocationId,CovertType,lat,lng)) as T
+    </select>
+     <!--删除生境信息-->
+   <delete id="deleteHabSub">
+      DELETE FROM BHQ_SpreadHabitatSub
+       <where>
+           <if test="SPID !=null and SPID !=''">
+            and  SPID=#{SPID}
+           </if>
+           <if test="PatrolId !=null and PatrolId !=''">
+             and PatrolId=#{PatrolId}
+           </if>
+       </where>
+    </delete>
+    <!--删除关联表的信息-->
+    <delete id="droRelation">
+        DELETE FROM BHQ_Sm_Relation
+        <where>
+            <if test="SPID !=null and SPID !=''">
+                and  SPID=#{SPID}
+            </if>
+            <if test="PatrolId !=null and PatrolId !=''">
+                and PatrolId=#{PatrolId}
+            </if>
+        </where>
+    </delete>
+</mapper>

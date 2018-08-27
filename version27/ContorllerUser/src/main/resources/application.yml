@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url:  jdbc:sqlserver://192.168.0.241:1433;DatabaseName=SW_Normal
+    username: sa
+    password:  771010321
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    mybatis:
+      mapper-locations: classpath:mapper/*.xml
+      mvc:
+          view:
+            suffix: .html
+            prefix: classpath:/templates/
+

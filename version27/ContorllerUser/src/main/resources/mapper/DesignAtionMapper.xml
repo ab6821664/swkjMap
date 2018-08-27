@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.DesignAtionMapper">
+        <resultMap id="designationmapper" type="com.swkj.mapdisplay.enitiy.Designation" autoMapping="true">
+             <result property="action" column="action"></result>
+             <result property="habitatId" column="habitatId"></result>
+             <result property="terrain" column="terrain"></result>
+             <result property="traceTime" column="traceTime"></result>
+             <result property="traceType" column="traceType"></result>
+             <result property="plantType" column="plantType"></result>
+             <result property="slopeId" column="slopeId"></result>
+        </resultMap>
+     <!-- 查询巡护过程中代号的信息-->
+    <select id="selectBymark" resultMap="designationmapper">
+         select action,habitatId,
+terrain,traceTime,traceType,coverColloid,coverPorosity,coverStructural,plantType,slopeId from
+(select ParamsCode,ParamsValue from dbo.PT_PatrolFindInfoSub
+where  PatrolId=#{patroid}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (AnimalCode,AnimalName,
+Lat,Action,Diatance,TraceType,FindContent,TraceTime,MonitorAddress,
+Altitude,PatrolLineId,Terrain,WeatherId,MonitorTime,PatrolLineName,
+Lng,HabitatId,coverColloid,coverPorosity,coverStructural,plantType,slopeId)) as T
+    </select>
+
+    <resultMap id="remapper" type="com.swkj.mapdisplay.enitiy.BaseDict" autoMapping="true">
+        <id column="id" property="id"></id>
+        <result property="name" column="name"></result>
+    </resultMap>
+     <!--将编号转换成要输出的值-->
+    <select id="selectByappoint" resultMap="remapper" parameterType="com.swkj.mapdisplay.enitiy.Designation">
+       select id,name from dbo.PT_BaseDict
+       <where>
+           <if test="appointlist !=null">
+        id in
+               (#{appointlist.action},#{appointlist.habitatId}
+               ,#{appointlist.terrain},#{appointlist.traceTime},#{appointlist.traceType},
+             #{appointlist.coverColloid},#{appointlist.coverPorosity},#{appointlist.coverStructural},#{appointlist.plantType},#{
+              appointlist.slopeId})
+           </if>
+       </where>
+    </select>
+    <!--查询巡护过程中动物要素的信息-->
+    <select id="queryBySpread" resultType="com.swkj.mapdisplay.enitiy.PatrolFindInfoSub">
+select SPID,PatrolSubId, AnimalCode,AnimalName,Lat,Action,Diatance,TraceType,
+FindContent,TraceTime,MonitorAddress,Altitude,PatrolLineId,
+Terrain,WeatherId,MonitorTime,PatrolLineName,Lng,HabitatId from
+(select SPID,PatrolSubId,ParamsCode,ParamsValue from dbo.BHQ_SpreadSub where
+SPID=#{spid} and PatrolSubId=#{PatrolSubId}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (AnimalCode,AnimalName,
+Lat,Action,Diatance,TraceType,FindContent,TraceTime,MonitorAddress,
+Altitude,PatrolLineId,Terrain,WeatherId,MonitorTime,PatrolLineName,
+Lng,HabitatId)) as T
+    </select>
+    <!--查询巡护过程中植物要素的信息-->
+    <select id="GainSpreadXhPlant" resultType="com.swkj.mapdisplay.enitiy.SpreadSubXhPlant">
+  select SPID,PatrolSubId, Qty,BotanyName,CoverType,GrowthSort,Phenological,GuanFu,CoverDegree,
+HealthStatus,Lng,Altitude,PatrolLineName,BotanyCode,MonitorAddress,PlantType,XiongJing,
+ Height,FirstFz,LocationId,FindContent,PatrolLineId,Lat,SlopeId,Terrain,MonitorTime,HabitatId from
+(select SPID,PatrolSubId,ParamsCode,ParamsValue from dbo.BHQ_SpreadSub where
+SPID=#{spid} and PatrolSubId=#{PatrolSubId}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (Qty,BotanyName,CoverType,GrowthSort,Phenological,GuanFu,CoverDegree,
+HealthStatus,Lng,Altitude,PatrolLineName,BotanyCode,MonitorAddress,PlantType,XiongJing,
+ Height,FirstFz,LocationId,FindContent,PatrolLineId,Lat,SlopeId,Terrain,MonitorTime,HabitatId)) as T
+    </select>
+    <!--查询巡护过程中BHQ_SpreadSub表中的所以代号的信息-->
+    <select id="getBymark" resultType="com.swkj.mapdisplay.enitiy.SpreadSubMark">
+   select Action,terrain,TraceType,TraceTime,HabitatId,CoverType,GrowthSort,
+Phenological,HealthStatus from
+(select ParamsCode,ParamsValue from dbo.BHQ_SpreadSub where
+SPID=#{markspid} and PatrolSubId=#{PatrolSubId}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (Action,terrain,TraceType,TraceTime,HabitatId,CoverType,GrowthSort,
+Phenological,HealthStatus)) as T
+    </select>
+
+    <!--将BHQ_SpreadSub表的要素编号转换成要输出的值-->
+    <select id="getBybaseDict" resultMap="remapper" parameterType="com.swkj.mapdisplay.enitiy.SpreadSubMark">
+        select  id,name from dbo.PT_BaseDict
+        <where>
+            <if test="spreadSubMark!=null">
+            id in(#{spreadSubMark.Action},#{spreadSubMark.terrain},#{spreadSubMark.TraceType},#{spreadSubMark.TraceTime},#{spreadSubMark.HabitatId},
+            #{spreadSubMark.CoverType},#{spreadSubMark.GrowthSort},#{spreadSubMark.Phenological},#{spreadSubMark.HealthStatus}
+            )
+            </if>
+        </where>
+    </select>
+
+</mapper>

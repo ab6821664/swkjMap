@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.PatrolLoationMapper">
+    <resultMap id="studentCourseMap" type="com.swkj.mapdisplay.enitiy.PatrolManageInfo" autoMapping="true">
+        <id property="userId" column="userId" />
+        <result property="userName" column="userName" />
+        <result property="patrolTypeId" column="patrolTypeId" />
+        <result property="patrolTypeName" column="patrolTypeName" />
+        <result property="beginTime" column="beginTime"  />
+        <result property="endTime" column="endTime" />
+        <result property="state" column="state" />
+        <result property="PatrolPlanId" column="PatrolPlanId" />
+        <collection property="PatrolList" ofType="com.swkj.mapdisplay.enitiy.PatrolLine">
+            <id property="PatrolLineId" column="PatrolLineId" />
+            <result property="ImagePath" column="ImagePath" />
+            <result property="Length" column="Length" />
+            <result property="LineName" column="LineName" />
+            <result property="RoleID" column="RoleID" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="resmana" type="com.swkj.mapdisplay.enitiy.PatrolManageInfo">
+          <id column="patrolId" property="patrolId"></id>
+          <result column="patrolPlanName" property="patrolPlanName"></result>
+        <result column="userName" property="userName"></result>
+        <result column="beginTime" property="beginTime" jdbcType="DATE"></result>
+        <result column="endTime" property="endTime"  jdbcType="DATE" ></result>
+        <result column="state" property="state" ></result>
+        <result property="PointCount" column="PointCount"></result>
+    </resultMap>
+    <select id="" resultMap="resmana">
+       select
+       PT_PatrolPlanInfo.patrolPlanName,
+       PT_patrolManageInfo.userName,
+       PT_patrolManageInfo.beginTime,
+       PT_patrolManageInfo.endTime,
+       PT_patrolManageInfo.state
+       from PT_PatrolPlanInfo inner join
+       PT_patrolManageInfo  on  PT_PatrolPlanInfo.patrolPlanId=PT_patrolManageInfo.patrolPlanId
+       left join  PT_PatrolLine on PT_PatrolPlanInfo.PATROLLINEID=PT_PatrolLine.PATROLLINEID
+    </select>
+    <!-- 查询巡护信息-->
+    <select id="PatrolLocationInfoquery" resultMap="resmana">
+select
+PPMI.patrolId,
+PPPI.patrolPlanName ,
+PPMI.userName ,
+PPMI.beginTime ,
+PPMI.endTime ,
+PPMI.state,
+(SELECT COUNT(pp.patrolId) as PointCount
+FROM PT_PatrolLocationInfo pp where  pp.patrolId=PPMI.patrolId) AS PointCount
+from PT_PatrolPlanInfo PPPI inner join
+PT_patrolManageInfo PPMI on  PPPI.patrolPlanId=PPMI.patrolPlanId
+left join (select PATROLLINEID ,LineName From PT_PatrolLine)
+PPL on PPPI.PATROLLINEID=PPL.PATROLLINEID where
+(
+SELECT COUNT(pp.patrolId)
+FROM PT_PatrolLocationInfo pp where  pp.patrolId=PPMI.patrolId)>1
+    </select>
+    <!-- 根据巡护id查询出相对应的值 -->
+    <select id="ManageInfoid" resultMap="resmana" parameterType="java.util.List">
+         select
+      PPMI.patrolId,
+PPPI.patrolPlanName ,
+ PPMI.userName ,
+PPMI.beginTime ,
+PPMI.endTime ,
+ PPMI.state,
+(SELECT COUNT(pp.patrolId) as PointCount
+FROM PT_PatrolLocationInfo pp where  pp.patrolId=PPMI.patrolId) AS PointCount
+from PT_PatrolPlanInfo PPPI inner join
+PT_patrolManageInfo PPMI on  PPPI.patrolPlanId=PPMI.patrolPlanId
+left join (select PATROLLINEID ,LineName From PT_PatrolLine)
+PPL on PPPI.PATROLLINEID=PPL.PATROLLINEID
+        <where>
+         <if test="patrolId!=null and patrolId!=''">
+             patrolId=#{patrolId} AND (
+             SELECT COUNT(pp.patrolId)
+             FROM PT_PatrolLocationInfo pp where  pp.patrolId=PPMI.patrolId)>0
+         </if>
+    </where>
+    </select>
+    <!--查询巡护过程中动物的信息 -->
+     <resultMap id="processlistmap" type="com.swkj.mapdisplay.enitiy.PatrolFindInfoSub" autoMapping="true">
+        <result property="AnimalCode" column="AnimalCode"></result>
+         <result property="AnimalName" column="AnimalName"></result>
+         <result property="Lat" column="Lat"></result>
+         <result property="Action" column="Action"></result>
+         <result property="Diatance" column="Diatance"></result>
+         <result property="TraceType" column="TraceType"></result>
+         <result property="FindContent" column="FindContent"></result>
+         <result property="TraceTime" column="TraceTime"></result>
+         <result property="MonitorAddress" column="MonitorAddress"></result>
+         <result property="Altitude" column="Altitude"></result>
+         <result property="PatrolLineId" column="PatrolLineId"></result>
+         <result property="Terrain" column="Terrain"></result>
+         <result property="WeatherId" column="WeatherId"></result>
+         <result property="MonitorTime" column="MonitorTime"></result>
+         <result property="PatrolLineName" column="PatrolLineName"></result>
+         <result property="Lng" column="Lng"></result>
+         <result property="HabitatId" column="HabitatId"></result>
+     </resultMap>
+
+    <select id="processlist" resultMap="processlistmap">
+  select AnimalCode,AnimalName,Lat,Action,Diatance,TraceType,
+FindContent,TraceTime,MonitorAddress,Altitude,PatrolLineId,
+Terrain,WeatherId,MonitorTime,PatrolLineName,Lng,HabitatId from
+(select ParamsCode,ParamsValue from dbo.PT_PatrolFindInfoSub where
+PatrolId=#{SubpatrolId}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (AnimalCode,AnimalName,
+Lat,Action,Diatance,TraceType,FindContent,TraceTime,MonitorAddress,
+Altitude,PatrolLineId,Terrain,WeatherId,MonitorTime,PatrolLineName,
+Lng,HabitatId)) as T
+    </select>
+    <!--查询巡护过程中生物因子的信息 -->
+    <resultMap id="processLmap" type="com.swkj.mapdisplay.enitiy.PatrolFindInfoSubSJYZ" autoMapping="true">
+        <result property="PlantType" column="PlantType"></result>
+        <result property="Terrain" column="Terrain"></result>
+        <result property="CoverPorosity" column="CoverPorosity"></result>
+        <result property="CoverStructural" column="CoverStructural"></result>
+        <result property="CoverColloid" column="CoverColloid"></result>
+        <result property="LocationId" column="LocationId"></result>
+        <result property="SlopeId" column="SlopeId"></result>
+        <result property="HabitatId" column="HabitatId"></result>
+        <result property="Altitude" column="Altitude"></result>
+        <result property="lng" column="lng"></result>
+        <result property="lat" column="lat"></result>
+    </resultMap>
+    <select id="paraList" resultMap="processLmap">
+     select PlantType,Terrain,CoverPorosity,CoverStructural,
+     CoverColloid,LocationId,SlopeId,HabitatId,Altitude,
+lng,lat
+ from
+(select ParamsCode,ParamsValue from dbo.PT_PatrolFindInfoSub where
+PatrolId=#{patroid}) AA
+PIVOT( MAX(ParamsValue) for ParamsCode in (PlantType,Terrain,CoverPorosity,
+CoverStructural,CoverColloid,LocationId,
+SlopeId,HabitatId,Altitude,lng,lat,
+CovertType,SmCode)) as T
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.RogatoryMapper">
+    <!--查询动物的详细信息-->
+   <select id="animal" resultType="com.swkj.mapdisplay.enitiy.Animal_Basic">
+       select * from BHQ_Animal_Basic
+  <where>
+      <if test="animalCode !=null and animalCode!=''">
+       AnimalCode=#{animalCode}
+      </if>
+  </where>
+   </select>
+    <!--查询出植物的详细信息-->
+    <select id="getbase" resultType="com.swkj.mapdisplay.enitiy.Botany">
+ select * from dbo.BHQ_Botany
+      <where>
+          <if test="botanyCode !=null and botanyCode!=''">
+              BotanyCode=#{botanyCode}
+          </if>
+    </where>
+    </select>
+    <!--查询界桩信息-->
+    <select id="selectBoundary" resultType="com.swkj.mapdisplay.enitiy.Boundary">
+        select  BHQID,BoundaryID,LocationName,BoundaryName,
+       Lat,Lng,Model,Publishdate,Content,BioImageId,CreationDate,
+       CreatedBy,LastUpdateDate,LastUpdatedBy,NativeCode from BHQ_Boundary
+       <where>
+       <if test="boundaryID !=null and boundaryID!=''">
+           BoundaryID=#{boundaryID}
+       </if>
+      </where>
+    </select>
+    <!--查询界栏信息-->
+    <select id="selectBrand" resultType="com.swkj.mapdisplay.enitiy.Brand">
+  select  BHQID,BrandID,LocationName,SortName,Qty,Lat,
+Lng,Model,Publisher,Sizes,Publishdate,Content,PersonLiable,
+BioImageId,CreationDate,CreatedBy,LastUpdateDate,LastUpdatedBy,
+NativeCode,BrandName from BHQ_Brand
+<where>
+    <if test="brandID !=null and brandID !=''">
+        BrandID=#{brandID}
+    </if>
+</where>
+    </select>
+    <!--查询人类活动信息-->
+    <select id="selectSpreadsub" resultType="com.swkj.mapdisplay.enitiy.SpreadSubhuman">
+   select SPID,PatrolId,Qty,InterfereTime,Lng,Altitude,MonitorAddress,
+Law,PatrolLineName,PatrolLineId,InterfereStrg,Lat,
+PunishResult,InterfereType,FindContent,MonitorTime from
+(select SPID,PatrolId,ParamsCode,ParamsValue from dbo.BHQ_SpreadSub where
+SPID=#{SPID} and
+PatrolId=#{PatrolId}) AA
+PIVOT( MAX(ParamsValue) for
+ParamsCode in (Qty,InterfereTime,Lng,Altitude,MonitorAddress,Law,
+PatrolLineName,PatrolLineId,InterfereStrg,Lat,PunishResult,
+InterfereType,FindContent,MonitorTime)) as T
+    </select>
+    <!--查询灾害监测信息-->
+    <select id="getSubDisasterInfo" resultType="com.swkj.mapdisplay.enitiy.SpreadSubnature">
+  select SPID,PatrolId,disasterDegree,MonitorAddress,MArea,Lat,
+PatrolLineName,disasterType,FindContent,MonitorTime,
+PatrolLineId,disasterTime,Lng,Altitude from (select
+SPID,PatrolId,ParamsCode,ParamsValue from dbo.BHQ_SpreadSub where
+SPID=#{SPID} and PatrolId=#{PatrolId}) AA PIVOT( MAX(ParamsValue)
+for ParamsCode in (disasterDegree,MonitorAddress,MArea,Lat,
+PatrolLineName,disasterType,FindContent,MonitorTime,PatrolLineId,
+disasterTime,Lng,Altitude)) as T
+    </select>
+    <!--查询出动物图片信息-->
+    <select id="selectAnimalImgIfon" resultType="com.swkj.mapdisplay.enitiy.Animal_BasicImg">
+         select ImageAddress,ImageData from BHQ_Animal_Basic_Img
+         <where>
+             <if test="BioImageId !=null and BioImageId !=''">
+               BioImageId=#{BioImageId}
+             </if>
+         </where>
+    </select>
+    <!--查询出植物图片信息-->
+    <select id="sekectBoatImgIfon" resultType="com.swkj.mapdisplay.enitiy.BoatImg">
+        select BoatImgAddress from dbo.BHQ_BoatImg
+        <where>
+            <if test="BoatImgId !=null and BoatImgId !=''">
+                BoatImgId=#{BoatImgId}
+            </if>
+        </where>
+    </select>
+</mapper>

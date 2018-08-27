@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.updateplatifon.AmendBotaMapper">
+   <!--修改界牌界碑信息-->
+    <update id="updateBoundary" parameterType="com.swkj.mapdisplay.enitiy.Boundary">
+      update dbo.BHQ_Boundary
+       <set>
+           <if test="LocationName !=null">
+               LocationName=#{LocationName},
+           </if>
+           <if test="BoundaryName !=null">
+               BoundaryName=#{BoundaryName},
+           </if>
+           <if test="Lat !=null">
+               Lat=#{Lat},
+           </if>
+           <if test="Lng !=null">
+               Lng=#{Lng},
+           </if>
+           <if test="Model !=null">
+               Model=#{Model},
+           </if>
+           <if test="Publishdate !=null">
+               Publishdate=#{Publishdate},
+           </if>
+           <if test="Content !=null">
+               Content=#{Content},
+           </if>
+           <if test="BioImageId !=null">
+               BioImageId=#{BioImageId},
+           </if>
+           <if test="CreationDate !=null">
+               CreationDate=#{CreationDate},
+           </if>
+           <if test="CreatedBy !=null">
+               CreatedBy=#{CreatedBy},
+           </if>
+           <if test="LastUpdatedBy !=null">
+               LastUpdatedBy=#{LastUpdatedBy},
+           </if>
+           <if test="NativeCode !=null">
+               NativeCode=#{NativeCode},
+           </if>
+      </set>
+        where BoundaryID=#{BoundaryID}
+    </update>
+    <!--修改牌栏信息-->
+    <update id="updateBrand" parameterType="com.swkj.mapdisplay.enitiy.Brand">
+        update BHQ_Brand
+        <set>
+            <if test="LocationName !=null">
+                LocationName=#{LocationName},
+            </if>
+            <if test="SortName !=null">
+                SortName=#{SortName},
+            </if>
+            <if test="Qty !=null">
+                Qty=#{Qty},
+            </if>
+            <if test="Lat !=null">
+                Lat=#{Lat},
+            </if>
+            <if test="Lng !=null">
+                Lng=#{Lng},
+            </if>
+            <if test="Model !=null">
+                Model=#{Model},
+            </if>
+            <if test="Publisher !=null">
+                Publisher=#{Publisher},
+            </if>
+            <if test="Sizes !=null">
+                Sizes=#{Sizes},
+            </if>
+            <if test="Publishdate !=null">
+                Publishdate=#{Publishdate},
+            </if>
+            <if test="Content !=null">
+                Content=#{Content},
+            </if>
+            <if test="PersonLiable !=null">
+                PersonLiable=#{PersonLiable},
+            </if>
+            <if test="BioImageId !=null">
+                BioImageId=#{BioImageId},
+            </if>
+            <if test="CreationDate !=null">
+                CreationDate=#{CreationDate},
+            </if>
+            <if test="CreatedBy !=null">
+                CreatedBy=#{CreatedBy},
+            </if>
+            <if test="LastUpdateDate !=null">
+                LastUpdateDate=#{LastUpdateDate},
+            </if>
+            <if test="LastUpdatedBy !=null">
+                LastUpdatedBy=#{LastUpdatedBy},
+            </if>
+            <if test="NativeCode !=null">
+                NativeCode=#{NativeCode},
+            </if>
+            <if test="BrandName !=null">
+                BrandName=#{BrandName},
+            </if>
+        </set>
+        where BrandID=#{BrandID}
+    </update>
+    <!--修改人类活动信息-->
+    <update id="updateJamming" parameterType="com.swkj.mapdisplay.enitiy.SpreadSubhuman">
+        UPDATE BHQ_SpreadSub
+        <set> ParamsValue = CASE ParamsCode
+            WHEN 'Qty' THEN #{Qty}
+            WHEN 'InterfereTime' THEN #{InterfereTime}
+            WHEN 'Lng' THEN #{Lng}
+            WHEN 'Altitude' THEN #{Altitude}
+            WHEN 'MonitorAddress' THEN #{MonitorAddress}
+            WHEN 'Law' THEN #{Law}
+            WHEN 'PatrolLineName' THEN #{PatrolLineName}
+            WHEN 'PatrolLineId' THEN #{PatrolLineId}
+            WHEN 'InterfereStrg' THEN #{InterfereStrg}
+            WHEN 'Lat' THEN #{Lat}
+            WHEN 'PunishResult' THEN #{PunishResult}
+            WHEN 'InterfereType' THEN #{InterfereType}
+            WHEN 'FindContent' THEN #{FindContent}
+            WHEN 'MonitorTime' THEN #{MonitorTime}
+        </set>
+        END
+        WHERE SPID=#{SPID} and PatrolId=#{PatrolId}
+        and ParamsCode in('Qty','InterfereTime','Lng','Altitude','MonitorAddress','Law','PatrolLineName','PatrolLineId','InterfereStrg',
+        'Lat','PunishResult','InterfereType','FindContent','MonitorTime'
+        )
+    </update>
+    <!--修改灾害监测信息-->
+    <update id="updateDisaster" parameterType="com.swkj.mapdisplay.enitiy.SpreadSubnature">
+        UPDATE BHQ_SpreadSub
+        <set> ParamsValue = CASE ParamsCode
+            WHEN 'disasterDegree' THEN #{disasterDegree}
+            WHEN 'MonitorAddress' THEN #{MonitorAddress}
+            WHEN 'MArea' THEN #{MArea}
+            WHEN 'Lat' THEN #{Lat}
+            WHEN 'PatrolLineName' THEN #{PatrolLineName}
+            WHEN 'FindContent' THEN #{FindContent}
+            WHEN 'MonitorTime' THEN #{MonitorTime}
+            WHEN 'PatrolLineId' THEN #{PatrolLineId}
+            WHEN 'disasterTime' THEN #{disasterTime}
+            WHEN 'Lng' THEN #{Lng}
+            WHEN 'Altitude' THEN #{Altitude}
+        </set>
+        END
+        WHERE SPID=#{SPID} and PatrolId=#{PatrolId}
+        and ParamsCode in('disasterDegree','MonitorAddress','MArea','Lat','PatrolLineName','FindContent','MonitorTime','PatrolLineId','disasterTime',
+        'Lng','Altitude')
+    </update>
+    <!--修改生境信息-->
+    <update id="updateSjyz" parameterType="com.swkj.mapdisplay.enitiy.SpreadHabitatSub">
+        UPDATE dbo.BHQ_SpreadHabitatSub
+        <set> ParamsValue = CASE ParamsCode
+            WHEN 'PlantType' THEN #{PlantType}
+            WHEN 'Terrain' THEN #{Terrain}
+            WHEN 'CoverPorosity' THEN #{CoverPorosity}
+            WHEN 'CoverStructural' THEN #{CoverStructural}
+            WHEN 'CoverColloid' THEN #{CoverColloid}
+            WHEN 'SlopeId' THEN #{SlopeId}
+            WHEN 'HabitatId' THEN #{HabitatId}
+            WHEN 'Altitude' THEN #{Altitude}
+            WHEN 'LocationId' THEN #{LocationId}
+            WHEN 'CovertType' THEN #{CovertType}
+            WHEN 'lat' THEN #{lat}
+            WHEN 'lng' THEN #{lng}
+        </set>
+        END
+        WHERE SPID=#{SPID} and PatrolId=#{PatrolId}
+        and ParamsCode in('PlantType','Terrain','CoverPorosity','CoverStructural','CoverColloid','SlopeId','HabitatId','Altitude','LocationId',
+        'CovertType','lat','lng')
+    </update>
+
+    <!--删除人类活动信息和灾害监测信息-->
+    <delete id="deleteJamming">
+     delete  from dbo.BHQ_SpreadSub where SPID=#{SPID}
+AND PatrolId=#{PatrolId}
+    </delete>
+
+    <!--增加人类活动信息-->
+    <insert id="addJamming" parameterType="java.util.Map">
+ insert into BHQ_SpreadSub(SPID,PatrolId,SortCode,ParamsCode,ParamsValue,PatrolMedioId)
+    values(#{SPID},#{PatrolId},'XhPeopleAction','Qty',#{sub.qty},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhPeopleAction','InterfereTime',#{sub.interfereTime},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhPeopleAction','Lng',#{sub.lng},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhPeopleAction','Altitude',#{sub.altitude},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','MonitorAddress',#{sub.monitorAddress},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','Law',#{sub.law},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','PatrolLineName',#{sub.patrolLineName},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhPeopleAction','PatrolLineId',#{sub.patrolLineId},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','InterfereStrg',#{sub.interfereStrg},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','Lat',#{sub.lat},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','PunishResult',#{sub.punishResult},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhPeopleAction','InterfereType',#{sub.interfereType},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','FindContent',#{sub.findContent},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhPeopleAction','MonitorTime',#{sub.monitorTime },#{PatrolMedioId})
+    </insert>
+    <!--增加灾害监测信息-->
+    <insert id="addXhdisaster" parameterType="java.util.Map">
+ insert into BHQ_SpreadSub(SPID,PatrolId,SortCode,ParamsCode,ParamsValue,PatrolMedioId)
+    values(#{SPID},#{PatrolId},'XhDisaster','disasterDegree',#{sub.disasterDegree},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhDisaster','MonitorAddress',#{sub.monitorAddress},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhDisaster','MArea',#{sub.MArea},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhDisaster','Lat',#{sub.lat},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','PatrolLineName',#{sub.patrolLineName},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','disasterType',#{sub.disasterType},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','FindContent',#{sub.findContent},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhDisaster','MonitorTime',#{sub.monitorTime},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','PatrolLineId',#{sub.patrolLineId},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','disasterTime',#{sub.disasterTime},#{PatrolMedioId}),(#{SPID},#{PatrolId},'XhDisaster','Lng',#{sub.lng},#{PatrolMedioId}),
+    (#{SPID},#{PatrolId},'XhDisaster','Altitude',#{sub.altitude},#{PatrolMedioId})
+
+    </insert>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.updateplatifon.UpdateIfonMapper">
+
+   <!--修改动物的分布信息-->
+  <update id="updateScatter" parameterType="com.swkj.mapdisplay.enitiy.PatrolFindInfoSub">
+    UPDATE BHQ_SpreadSub
+    <set> ParamsValue = CASE ParamsCode
+        WHEN 'AnimalCode' THEN #{AnimalCode}
+        WHEN 'AnimalName' THEN #{AnimalName}
+        WHEN 'Lat' THEN #{Lat}
+        WHEN 'Action' THEN #{Action}
+        WHEN 'Diatance' THEN #{Diatance}
+        WHEN 'TraceType' THEN #{TraceType}
+        WHEN 'FindContent' THEN #{FindContent}
+        WHEN 'TraceTime' THEN #{TraceTime}
+        WHEN 'MonitorAddress' THEN #{MonitorAddress}
+        WHEN 'Altitude' THEN #{Altitude}
+        WHEN 'PatrolLineId' THEN #{PatrolLineId}
+        WHEN 'Terrain' THEN #{Terrain}
+        WHEN 'WeatherId' THEN #{WeatherId}
+        WHEN 'MonitorTime' THEN #{MonitorTime}
+        WHEN 'PatrolLineName' THEN #{PatrolLineName}
+        WHEN 'Lng' THEN #{Lng}
+        WHEN 'HabitatId' THEN #{HabitatId}
+    </set>
+    END
+WHERE SPID=#{SPID} and PatrolSubId=#{PatrolSubId}
+ and ParamsCode in('AnimalCode','AnimalName','Lat','Action','Diatance','TraceType','FindContent','TraceTime','MonitorAddress',
+ 'Altitude','PatrolLineId','Terrain','WeatherId','MonitorTime','PatrolLineName','Lng','HabitatId'
+ )
+  </update>
+    <!--修改植物的分布信息-->
+    <update id="updatePlant" parameterType="com.swkj.mapdisplay.enitiy.SpreadSubXhPlant">
+        UPDATE BHQ_SpreadSub
+        <set> ParamsValue = CASE ParamsCode
+            WHEN 'MonitorAddress' THEN #{MonitorAddress}
+            WHEN 'Qty' THEN #{Qty}
+            WHEN 'BotanyName' THEN #{BotanyName}
+            WHEN 'Altitude' THEN #{Altitude}
+            WHEN 'Phenological' THEN #{Phenological}
+            WHEN 'FirstFz' THEN #{FirstFz}
+            WHEN 'CoverDegree' THEN #{CoverDegree}
+            WHEN 'XiongJing' THEN #{XiongJing}
+            WHEN 'Lat' THEN #{Lat}
+            WHEN 'FindContent' THEN #{FindContent}
+            WHEN 'MonitorTime' THEN #{MonitorTime}
+            WHEN 'GrowthSort' THEN #{GrowthSort}
+            WHEN 'HealthStatus' THEN #{HealthStatus}
+            WHEN 'Height' THEN #{Height}
+            WHEN 'GuanFu' THEN #{GuanFu}
+            WHEN 'Lat' THEN #{Lat}
+        </set>
+        END
+        WHERE SPID=#{SPID} and PatrolSubId=#{PatrolSubId}
+        and ParamsCode in('MonitorAddress','Qty','Phenological','FirstFz','CoverDegree','XiongJing','Lat','FindContent','MonitorTime',
+        'GrowthSort','HealthStatus','Height','GuanFu','Lat','BotanyName','Altitude'
+        )
+    </update>
+</mapper>

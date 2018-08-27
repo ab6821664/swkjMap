@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.swkj.mapdisplay.mapper.appendmapper.AddanimalIfonMapper">
+     <!--添加动物分布信息-->
+    <insert id="addAnimal" parameterType="com.swkj.mapdisplay.enitiy.PatrolFindInfoSub">
+   insert into BHQ_SpreadSub(SPID,SortCode,ParamsCode,ParamsValue,PatrolMedioId)
+    values(#{SPID},'XhAnimal','AnimalCode',#{basic.AnimalCode},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','AnimalName',#{basic.AnimalName},#{PatrolMedioId}),(#{SPID},'XhAnimal','Lat',#{basic.Lat},#{PatrolMedioId}),(#{SPID},'XhAnimal','Action',#{basic.Action},#{PatrolMedioId}),(#{SPID},'XhAnimal','Diatance',#{basic.Diatance},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','TraceType',#{basic.TraceType},#{PatrolMedioId}),(#{SPID},'XhAnimal','FindContent',#{basic.FindContent},#{PatrolMedioId}),(#{SPID},'XhAnimal','TraceTime',#{basic.TraceTime},#{PatrolMedioId}),(#{SPID},'XhAnimal','MonitorAddress',#{basic.MonitorAddress},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','Altitude',#{basic.Altitude},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','PatrolLineId',#{basic.PatrolLineId},#{PatrolMedioId}),(#{SPID},'XhAnimal','Terrain',#{basic.Terrain},#{PatrolMedioId}),(#{SPID},'XhAnimal','WeatherId',#{basic.WeatherId},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','MonitorTime',#{basic.MonitorTime},#{PatrolMedioId}),(#{SPID},'XhAnimal','PatrolLineName',#{basic.PatrolLineName},#{PatrolMedioId}),
+    (#{SPID},'XhAnimal','Lng',#{basic.Lng},#{PatrolMedioId}),(#{SPID},'XhAnimal','HabitatId',#{basic.HabitatId},#{PatrolMedioId})
+    </insert>
+    <!--添加植物分布信息-->
+    <insert id="addPlant" parameterType="com.swkj.mapdisplay.enitiy.SpreadSubXhPlant">
+   insert into BHQ_SpreadSub(SPID,SortCode,ParamsCode,ParamsValue,PatrolMedioId)
+    values(#{SPID},'XhPlant','MonitorAddress',#{basic.MonitorAddress},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','BotanyName',#{basic.BotanyName},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','Altitude',#{basic.Altitude},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','Qty',#{basic.Qty},#{PatrolMedioId}),(#{SPID},'XhPlant','Phenological',#{basic.Phenological},#{PatrolMedioId}),(#{SPID},'XhPlant','FirstFz',#{basic.FirstFz},#{PatrolMedioId}),(#{SPID},'XhPlant','CoverDegree',#{basic.CoverDegree},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','XiongJing',#{basic.XiongJing},#{PatrolMedioId}),(#{SPID},'XhPlant','Lat',#{basic.Lat},#{PatrolMedioId}),(#{SPID},'XhPlant','FindContent',#{basic.FindContent},#{PatrolMedioId}),(#{SPID},'XhPlant','MonitorTime',#{basic.MonitorTime},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','GrowthSort',#{basic.GrowthSort},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','HealthStatus',#{basic.HealthStatus},#{PatrolMedioId}),(#{SPID},'XhPlant','Height',#{basic.Height},#{PatrolMedioId}),(#{SPID},'XhPlant','GuanFu',#{basic.GuanFu},#{PatrolMedioId}),
+    (#{SPID},'XhPlant','Lat',#{basic.Lat},#{PatrolMedioId})
+    </insert>
+    <!--添加动物数量信息-->
+     <insert id="raiseFindQty" parameterType="java.util.List">
+         insert into PT_PatrolFindQty(patrolId,PatrolSubId,GrowthState,MaleQty,FemaleQty,TotalQty) values
+         <foreach collection ="list" item="list" index= "index"  separator=",">
+             (
+             #{patrolId,},
+             #{PatrolSubId},
+             #{list.GrowthState},
+             #{list.MaleQty},
+             #{list.FemaleQty},
+             #{list.TotalQty}
+             )
+         </foreach >
+     </insert>
+</mapper>

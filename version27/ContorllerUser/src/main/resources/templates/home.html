@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>地图展示</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
+
+    <link rel="stylesheet" href="./css/home.css">
+    <link rel="stylesheet" href="./js/layui-v2.3.0/layui/css/layui.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var dojoConfig = {
+            has: {
+                "esri-featurelayer-webgl": 1
+            }
+        }
+    </script>
+
+</head>
+<body>
+
+<div class="lineLiatContain" style="display: block">
+<table id="lineList" lay-filter="test"></table>
+    <script type="text/html" id="barLineList">
+        <span class="layui-btn layui-btn-xs" lay-event="createLine" data-alreadyCreated=false>生成线路</span>
+    </script>
+</div>
+<div id="viewDiv">
+</div>
+<div id="menContain">
+    <div class="menu-title"><h5>地理空间信息展示    <span class="menu-symbol">菜单</span></h5>
+              <ul class="childMenu fix-clear">
+                  <li class="childMenuActive">展示</li>
+                  <li>线路</li>
+                  <li>测量</li>
+                  <li>工具</li>
+              </ul>
+    </div>
+    <div id="menuSection">
+    <div id="controll" class="controll">
+       <p class="choose-toggle3D"> <input type="radio" name="toggle3D" value="2D" checked id="toggle2D"><label>2D</label><input type="radio" name="toggle3D" value="3D" id="toggle3D"><label>3D</label></p>
+        <button id="resetShow" class="chooseShow">重置</button>
+        <div v-for="(item,index) in layer" class="itemShow">
+            <p v-show="item.beginType"><button class="chooseShow" v-bind:id="item.type" >{{item.beginType}}</button></p>
+            <input type="checkbox" name="layerName"  class="all-choose" v-show="item.type==nowShow" v-bind:ifAllChoose="item.id" disabled>
+            <label v-show="item.type==nowShow" class="testCheckedBox" v-bind:data="item.id" checked=false;>{{item.name}}</label>
+         <!--   <span class="glyphicon glyphicon-arrow-right" v-show="item.type==nowShow"></span>   -->
+            <div v-show="item.showIf&&item.type==nowShow">
+                <table class="detail-table"  v-bind:id="item.name">
+                    <tr v-for="(value,key) in item.showDetail" v-show="value.visibility">
+                         <td><input type="checkbox" v-bind:value="value.name"  v-bind:name="item.showSymbol" checked v-bind:layerId="item.id"></td>
+                         <td>{{value.id}}</td>
+                         <td class="showDetailClass" v-bind:x="value.latitude" v-bind:y="value.longitude">{{value.name}}</td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="controll" id="lineSection">
+     <button class="btn btn-success" id="lineShow" data-controllShow=false>巡护轨迹展现</button><br>
+        <span class="speedSymbol">快</span><input type="range" value=50 max=1000 min=10 id="speed"><span>慢</span>
+        <div class="lineCreated">
+            <p v-for="item in line">
+                <input type="checkbox" checked v-bind:data-id="item.id" class="chooseCreatedLine">
+                <span v-bind:data-id="item.id" class="lineListShow">{{item.name}}</span>
+                <br><input type="button" value="模拟巡护" v-on:click="simulatePatrol($event)" v-bind:data-path="item.id">
+            </p>
+        </div>
+    </div>
+     <div class="controll" id="measureSection">
+         <p id="reset-measure">重新绘制测量</p>
+         <input type="button" value="测量两点距离" class="layui-btn measureMenu" data-active="measureTwoPoint">
+          <div>
+              <p v-for="item in twoPoint">{{item}}</p>
+              <span v-show="twoPointResult" class="measureResult">距离：{{twoPointResult}}米</span>
+          </div>
+         <input type="button" value="测量线路距离" class="layui-btn layui-btn-primary measureMenu" data-active="measureLine">
+          <div>
+              <p v-for="item in linePoint">{{item}}</p>
+              <span v-show="linePointResult" class="measureResult">距离：{{linePointResult}}米</span>
+          </div>
+         <input type="button" value="测量区域面积" class="layui-btn layui-btn-primary measureMenu" data-active="measureArea">
+         <div>
+             <p v-for="item in areaPoint">{{item}}</p>
+             <span v-show="areaPointResult" class="measureResult">面积{{areaPointResult}}平方米</span>
+         </div>
+
+     </div>
+        <div class="controll" id="tools">
+            <p class="tool-location">
+                <h5>坐标定位</h5>
+                <label>经度</label><input type="text" class="locationInputed" v-model="location[0]">
+                <label>维度</label><input type="text" class="locationInputed" v-model="location[1]">
+                <input type="button" class="layui-btn layui-btn-sm" value="定位" id="loctionAction">
+            </p>
+               <hr class="toolSeparate"/>
+            <p>
+                <h5>要素新增</h5>
+                <select id="addWhichLayer">
+                    <option selected value="animal-popMsg">动物</option>
+                    <option value="plant-popMsg">植物</option>
+                    <option value="brand-popMsg">牌栏</option>
+                    <option value="boundary-popMsg">界碑</option>
+                    <option value="habitat-popMsg">生境点</option>
+                    <option value="camera-popMsg">视频监控</option>
+                    <option value="trouble-popMsg">人为干扰</option>
+                    <option value="disaster-popMsg">灾害监测</option>
+
+                </select>
+                <input type="button" class="layui-btn layui-btn-sm" value="新增" id="addFeature"><br>
+                <label>经度</label><input type="text" class="locationInputed" v-model="addLat">
+                <label>维度</label><input type="text" class="locationInputed" v-model="addLng">
+            </p>
+            <hr class="toolSeparate"/>
+            <p>
+            <h5>保护区选择性展示</h5>
+             <label>请选择需要展示的保护区</label>
+            <select id="selectProtect">
+                <option value=">0">所有保护区</option>
+                <option value="=40000" data-center-lng="112.972" data-center-lat="28.2013">长沙保护区</option>
+                <option value="=43010" data-center-lng="111.340" data-center-lat="28.6327">保护区一</option>
+                <option value="=43001" data-center-lng="109.925" data-center-lat="29.7518">保护区二</option>
+            </select>
+            </p>
+            <hr class="toolSeparate"/>
+            <p>
+                <h5>用户权限控制</h5>
+                <select id="userStatus">
+                    <option selected value="superUser">超级用户</option>
+                    <option value="commonUser">普通用户</option>
+                </select>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<div class="popTemplate">
+    <div id="animal-popMsg">
+        <p>动物属性</p>
+        <table class="msgPopup">
+            <tr>
+                <td>编号：{{msgAttributes.animalCode}}</td><td>保护级别：{{msgAttributes.protectTypeName}}</td><td>中文名称：{{msgAttributes.animalName}}</td>
+            </tr>
+            <tr>
+                <td>门：{{msgAttributes.door_C}}</td><td>纲：{{msgAttributes.gand_C}}</td><td>拉丁名：{{msgAttributes.latinName}}</td>
+            </tr>
+            <tr>
+                <td>目：{{msgAttributes.orders_C}}</td><td>科：{{msgAttributes.family_C}}</td><td>别名：{{msgAttributes.kidName}}</td>
+            </tr>
+            <tr>
+                <td>属：{{msgAttributes.genus_C}}</td><td>种：{{msgAttributes.species}}</td><td>英文名：{{msgAttributes.englishName}}</td>
+            </tr>
+        </table>
+        <p class="attributeSection">动物分布</p>
+
+        <table class="msgPopup">
+            <tr>
+                <td>监测地点：<input type="text" v-model="msgMonitor.monitorAddress" disabled name="monitorAddress"></td>
+                <td>离人距离：<input type="text" v-model="msgMonitor.diatance" disabled name="diatance"></td>
+                <td>监测时间：<input type="text" v-model="msgMonitor.monitorTime" disabled name="monitorTime"></td>
+            </tr>
+            <tr>
+                <td>天气情况：<input type="text" v-model="msgMonitor.weatherId" disabled name="weatherId"></td>
+                <td>行为：<select name="action" disabled v-model="msgMonitor.action">
+                    <option v-for="item in Action" v-bind:value="item.id">{{item.name}}</option>
+                </select></td>
+                <td>出现时间：
+                    <select v-model="msgMonitor.traceTime" disabled name="traceTime">
+                        <option v-for="item in TraceTime" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>痕迹：<select name="traceType" disabled v-model="msgMonitor.traceType">
+                    <option v-for="item in TraceType" v-bind:value="item.id">{{item.name}}</option></select></td>
+                </td>
+                <td>经度：<input type="text"v-model="msgMonitor.lng" disabled name="lng"></td>
+                <td>纬度：<input type="text" v-model="msgMonitor.lat" disabled name="lat"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="生境信息展示" v-on:click="getHabitatMsg"></td><td><input type="button" value="数量信息" id="showNumberMsg"></td><td></td>
+            </tr>
+            <tr>
+                <td>描述：<input type="text" v-model="msgMonitor.findContent" disabled name="findContent"></td>
+                <td>动物名字：<input type="text" v-model="msgMonitor.animalName" disabled name="animalName"></td>
+            </tr>
+        </table>
+
+        <p class="editSection"><input type="button" value="取消"  id="animalPopupCancel"><input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="animalPopupSave"></p>
+
+    </div>
+     <table id="animal-number">
+           <tr>
+               <th>类型/数量</th><th>雄体数量</th><th>雌体数量</th><th>合计</th>
+           </tr>
+         <tr>
+              <td>幼体</td><td>{{young.MaleQty}}</td><td>{{young.FemaleQty}}</td><td>{{young.TotalQty}}</td>
+         </tr>
+         <tr>
+             <td>成体</td><td>{{adult.MaleQty}}</td><td>{{adult.FemaleQty}}</td><td>{{adult.TotalQty}}</td>
+         </tr>
+         <tr>
+             <td>老体</td><td>{{old.MaleQty}}</td><td>{{old.FemaleQty}}</td><td>{{old.TotalQty}}</td>
+         </tr>
+         <tr>
+             <td>痕迹</td><td>{{trace.MaleQty}}</td><td>{{trace.FemaleQty}}</td><td>{{trace.TotalQty}}</td>
+         </tr>
+         <tr>
+             <td>尸体</td><td>{{body.MaleQty}}</td><td>{{body.FemaleQty}}</td><td>{{body.TotalQty}}</td>
+         </tr>
+     </table>
+
+    <div id="plant-popMsg">
+        <p>植物属性</p>
+        <table class="msgPopup">
+            <tr>
+                <td>编号：{{msgAttributes.animalCode}}</td><td>保护级别：{{msgAttributes.protectTypeName}}</td><td>中文名称：{{msgAttributes.botanyName}}</td>
+            </tr>
+            <tr>
+                <td>门：{{msgAttributes.door_C}}</td><td>纲：{{msgAttributes.gand_C}}</td><td>拉丁名：{{msgAttributes.latinName}}</td>
+            </tr>
+            <tr>
+                <td>目：{{msgAttributes.orders_C}}</td><td>科：{{msgAttributes.family_C}}</td><td>别名：{{msgAttributes.kidName}}</td>
+            </tr>
+            <tr>
+                <td>属：{{msgAttributes.genus_C}}</td><td>种：{{msgAttributes.species}}</td><td>英文名：{{msgAttributes.englishName}}</td>
+            </tr>
+            <tr>
+                <td colspan="3"><label>描述：</label><input type="textarea" v-bind:value="msgAttributes.remark"></td>
+            </tr>
+        </table>
+        <p class="attributeSection">植物分布</p>
+        <table class="msgPopup">
+            <tr>
+                <td>监测地点：<input type="text" v-model="msgMonitor.monitorAddress" disabled name="monitorAddress"></td><td>数量：<input type="text" v-model="msgMonitor.qty" disabled name="qty"></td>
+                <td>健康状况：<select name="healthStatus" disabled v-model="msgMonitor.healthStatus"><option v-for="item in HealthStatus" v-bind:value="item.id">{{item.name}}</option></select></td>
+            </tr>
+            <tr>
+                <td name="lng">经度：<input type="text" v-model="msgMonitor.lng" disabled name="lng"></td><td>纬度：<input type="text" v-model="msgMonitor.lat" disabled name="lat"></td>
+                <td>胸径：<input type="text" v-model="msgMonitor.xiongJing" disabled name="xiongJing"></td>
+            </tr>
+            <tr>
+                <td>物候期：<select name="phenological" disabled v-model="msgMonitor.phenological"><option v-for="item in Phenological" v-bind:value="item.id">{{item.name}}</option></select></td>
+                <td>高度：<input type="text" v-model="msgMonitor.height" disabled name="height"></td>
+                <td>冠幅：<input type="text" v-model="msgMonitor.guanFu" disabled name="guanFu"></td>
+            </tr>
+            <tr>
+                <td>第一分支：<input type="text" v-model="msgMonitor.firstFz" disabled name="firstFz"></td>
+                <td>盖度：<input type="text" v-model="msgMonitor.coverDegree" disabled name="coverDegree"></td>
+                <td>生长类型：<select name="growthSort" disabled v-model="msgMonitor.habitatId"><option v-for="item in GrowthSort" v-bind:value="item.id">{{item.name}}</option></select></td>
+            </tr>
+
+            <tr>
+                <td><input type="button" value="生境信息展示"></td><td>植物名字：<input type="text" v-model="msgMonitor.botanyName" name="botanyName"></td>
+                <td>地形：<input type="text" v-model="msgMonitor.terrain" name="terrain"></td>
+            </tr>
+            <tr>
+                <td>描述：<input type="text" v-model="msgMonitor.findContent" disabled name="findContent"></td>
+                <td>监测时间：<input type="text" v-model="msgMonitor.monitorTime" disabled name="monitorTime"></td>
+                <td>海拔：<input type="text" v-model="msgMonitor.altitude" disabled name="altitude"></td>
+            </tr>
+        </table>
+
+        <p class="editSection"><input type="button" value="取消"  id="plantPopupCancel">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="plantPopupSave">
+        </p>
+    </div>
+
+    <div id="brand-popMsg">
+        <table class="msgPopup">
+            <tr>
+                <td>牌栏：<input v-model="msg.brandName" disabled name="brandName"></td><td>责任人：<input v-model="msg.personLiable" disabled name="personLiable"></td>
+                <td>发行人：<input v-model="msg.publisher" disabled name="publisher"></td>
+            </tr>
+            <tr>
+                <td>经度：<input v-model="msg.lng" disabled name="lng"></td><td>纬度：<input v-model="msg.lat" disabled name="lat"></td>
+                <td>材质：<input v-model="msg.sortName" disabled name="sortName"></td>
+            </tr>
+            <tr>
+                <td>数量：<input v-model="msg.qty" disabled name="qty"></td><td>时间：<input type="datetime" v-model="msg.creationDate" disabled name="creationDate"></td>
+                <td>地址：<input v-model="msg.locationName" disabled name="locationName"></td>
+            </tr>
+        </table>
+        <p class="editSection"><input type="button" value="取消"  id="brandPopupCancel">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="brandPopupSave">
+        </p>
+    </div>
+
+    <div id="boundary-popMsg">
+        <p>界桩界牌信息展示</p>
+        <table class="msgPopup">
+            <tr>
+                <td>界桩界牌：<input v-model="msg.boundaryName" name="boundaryName"></td><td>安放时间：<input v-model="msg.creationDate" name="creationDate">
+                 </td><td>地点：<input v-model="msg.locationName" name="locationName"></td>
+            </tr>
+            <tr>
+                <td>经度：<input v-model="msg.lng" name="lng"></td><td>纬度：<input v-model="msg.lat" name="lat"></td>
+                <td>材质：<input v-model="msg.model" name="model"></td>
+            </tr>
+            <tr>
+                <td>说明：<input v-model="msg.content" name="content"></td>
+            </tr>
+        </table>
+        <p class="editSection"><input type="button" value="取消"  id="boundaryPopupCancel">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="boundaryPopupSave">
+        </p>
+    </div>
+
+    <div id="trouble-popMsg">
+        <p>人为干扰</p>
+        <table class="msgPopup">
+            <tr>
+                <td>巡护人员：<input v-model="msg.patrolLineName" name="patrolLineName"></td>
+                <td>执法地点：<input v-model="msg.monitorAddress" name="monitorAddress"></td>
+                <td>执法时间：<input v-model="msg.monitorTime" name="monitorTime"></td>
+            </tr>
+            <tr>
+                <td>经度：<input v-model="msg.lng" name="lng"></td>
+                <td>纬度：<input v-model="msg.lat" name="lat"></td>
+                <td>干扰类型：
+                    <select v-model="msg.interfereType" name="interfereType">
+                        <option v-for="item in InterfereType" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>干扰强度：
+                    <select v-model="msg.interfereStrg" name="interfereStrg">
+                        <option v-for="item in InterfereStrg" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>干扰时间：
+                      <select v-model="msg.interfereTime" name="interfereTime">
+                          <option v-for="item in InterfereTime" v-bind:value="item.id">{{item.name}}</option>
+                      </select>
+                </td>
+                <td>数量：<input v-model="msg.qty" name="qty"></td>
+            </tr>
+            <tr>
+                <td>海拔：<input v-model="msg.altitude" name="altitude"></td>
+                <td>执法依据：
+                    <select v-model="msg.law" name="law">
+                        <option v-for="item in Law" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>处罚结果：<input v-model="msg.punishResult" name="punishResult"></td>
+            </tr>
+        </table>
+        <p class="editSection"><input type="button" value="取消"  id="troublePopupCancel">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="troublePopupSave">
+        </p>
+    </div>
+
+    <div id="disaster-popMsg">
+        <p>灾害监测</p>
+        <table class="msgPopup">
+            <tr>
+                <td>灾害类型：
+                    <select v-model="msg.disasterType" name="disasterType">
+                        <option v-for="item in disasterType" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>灾害时间：
+                    <select v-model="msg.monitorTime" name="monitorTime">
+                        <option v-for="item in disasterTime" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>灾害地点：<input v-model="msg.monitorAddress" name="monitorAddress"></td>
+            </tr>
+            <tr>
+                <td>经度：<input v-model="msg.lng" name="lng"></td>
+                <td>纬度：<input v-model="msg.lat" name="lat"></td>
+                <td>灾害程度：
+                    <select v-model="msg.disasterDegree" name="disasterDegree">
+                        <option v-for="item in disasterDegree" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>灾害面积：<input v-model="msg.MArea" name="MArea"></td>
+                <td>描述：<input v-model="msg.findContent" name="findContent"></td>
+                <td>海拔：<input v-model="msg.altitude" name="altitude"></td>
+            </tr>
+        </table>
+        <p class="editSection"><input type="button" value="取消"  id="disaster">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="disasterPopupSave">
+        </p>
+    </div>
+
+    <div id="habitat-popMsg">
+        <p>生境环境信息如下</p>
+        <table class="msgPopup">
+            <tr>
+                <td>植被类型：<select v-model="msg.plantType">
+                                 <option v-for="item in PlantType" v-bind:value="item.id">{{item.name}}</option>
+                             </select>
+                </td>
+                <td>生境类型：<select v-model="msg.habitatId">
+                                <option v-for="item in HabitatId" v-bind:value="item.id">{{item.name}}</option>
+                             </select>
+                </td>
+                <td>地形特征：
+                    <select v-model="msg.terrain">
+                        <option v-for="item in Terrain" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>经度：<input type="text" v-model="msg.lng" name="lng"></td>
+                <td>纬度：<input type="text" v-model="msg.lat" name="lat"></td>
+                <td>海拔：<input type="text" v-model="msg.altitude" name="altitude"></td>
+            </tr>
+            <tr>
+                <td>土壤结构：
+                    <select v-model="msg.coverStructural">
+                        <option v-for="item in CoverStructural" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>土壤类型：
+                    <select v-model="msg.covertType">
+                        <option v-for="item in CovertType" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>土壤胶体：
+                    <select v-model="msg.coverColloid">
+                        <option v-for="item in CoverColloid" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>土壤孔隙：
+                    <select v-model="msg.coverPorosity">
+                        <option v-for="item in CoverPorosity" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+                <td>坡度：
+                    <select v-model="msg.slopeId">
+                        <option v-for="item in SlopeId" v-bind:value="item.id">{{item.name}}</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <p class="editSection"><input type="button" value="取消"  id="habitat">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="habitatPopupSave">
+        </p>
+    </div>
+    <div id="camera-popMsg">
+        <p>视频监控信息如下</p>
+         <table class="msgPopup">
+             <tr>
+                 <td>摄像机名称：<input v-model="msg.cameraName" name="cameraName"></td>
+                 <td>安装位置：<input v-model="msg.installPos" name="installPos"></td>
+                 <td>安装时间：<input v-model="msg.installTime" name="installTime"></td>
+             </tr>
+             <tr>
+                 <td>运行状态：
+                     <select v-model="msg.runState" name="runState"><option v-for="item in RunState" v-bind:value="item.id">{{item.name}}</option></select>
+                 </td>
+                 <td>所属厂家：
+                     <select v-model="msg.factory" name="factory"><option v-for="item in Factory" v-bind:value="item.id">{{item.name}}</option></select>
+                 </td>
+                 <td>IP地址：<input v-model="msg.ipAddress" name="ipAddress"></td>
+             </tr>
+             <tr>
+                 <td>用户名：<input v-model="msg.userName" name="userName"></td>
+                 <td>摄像头编号：<input v-model="msg.cameraId" name="cameraId"></td>
+                 <td>端口：<input v-model="msg.port" name="port"></td>
+             </tr>
+             <tr>
+                 <td>所属类型：
+                      <select v-model="msg.type" name="type"><option v-for="item in type" v-bind:value="item.id">{{item.name}}</option></select>
+                 </td>
+                 <td>经度：<input v-model="msg.lng" name="lng"></td>
+                 <td>纬度：<input v-model="msg.lat" name="lat"></td>
+             </tr>
+             <tr>
+
+                 <td>车道ID：<input v-model="msg.CDID" name="CDID"></td>
+
+             </tr>
+         </table>
+        <p class="editSection"><input type="button" value="取消"  id="camera">
+            <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="cameraPopupSave">
+        </p>
+    </div>
+</div>
+<div id="quatrat-popMsg">
+    <p>样地信息如下</p>
+    <table class="msgPopup">
+        <tr>
+            <td>样方编号：<input v-model="msg.quadratDataCode" name="quadratDataCode"></td>
+            <td>样方名称：<input v-model="msg.quadratDataName" name="quadratDataName"></td>
+            <td>调查人：<input v-model="msg.installTime" name="invester"></td>
+        </tr>
+        <tr>
+            <td>调查时间：<input v-model="msg.investerDate" name="investerDate"></td>
+            <td>土壤类型：
+                <select v-model="msg.soilCode" name="soilCode"><option v-for="item in soilCode" v-bind:value="item.id">{{item.name}}</option></select>
+            </td>
+            <td>坡度：<input v-model="msg.gradient" name="gradient"></td>
+        </tr>
+        <tr>
+            <td>坡向：<input v-model="msg.aspect" name="aspect"></td>
+            <td>面积：<input v-model="msg.area" name="area"></td>
+            <td>海拔：<input v-model="msg.altitude" name="altitude"></td>
+        </tr>
+        <tr>
+            <td>地点：<input v-model="msg.address" name="address"></td>
+            <td>繁殖场厚度：<input v-model="msg.humusspy" name="humusspy"></td>
+        </tr>
+    </table>
+    <p class="editSection"><input type="button" value="取消"  id="quadrat">
+        <input type="button" value="编辑" class="popupEdit"><input type="button" value="保存" id="quadratPopupSave">
+    </p>
+</div>
+</body>
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="./js/layui-v2.3.0/layui/layui.all.js"></script>
+<script src="https://webapi.amap.com/maps?v=1.4.8&key=316dfa7661163458cec4a2b76c51b4a6"></script>
+<script src="https://js.arcgis.com/4.8/"></script>
+
+<script src="./js/home.js"></script>
+</html>
