@@ -46,6 +46,12 @@ window.onload=function() {
             return target;
         }
     }
+    // 初始化数据
+    var initializ=function(data){
+        for(item in data){
+            data[item]="";
+        }
+    }
     var showMap=new Vue({
         el:"#controll",
         data:mapData,
@@ -652,6 +658,7 @@ window.onload=function() {
                         var urlTranslate = "/selectinFormation/" + spid + "/" + subid;
                         var url = "/getSpreadSubInfo/" + spid + "/" + subid;
                         var urlAnimalAttribute = "/selectBeast/" + animolCode;
+                        initializ(animalPopupMsg.msgMonitor);initializ(animalPopupMsg.msgAttributes);
                           $.get(urlTranslate, function (data) {
                             var animalAttributes;
                             $.get(urlAnimalAttribute, function (data) {
@@ -743,6 +750,7 @@ window.onload=function() {
                         })
                     }
                      if(whichLayer=="植物"){
+                        initializ(plantPopupMsg.msgAttributes);initializ(plantPopupMsg.msgMonitor);
                         var urlTranslate = "/selectinFormation/" + spid + "/" + subid;
                         var url = "/queryBySpreadSubifon/" + spid + "/" + subid;
                         var urlPlantAttribute = "/queryPlant/" + animolCode;
@@ -787,6 +795,7 @@ window.onload=function() {
                         })
                      }
                      if(whichLayer=="牌栏"){
+                        initializ(brandPopupMsg.msg)
                             var url="/selectStone/"+spid;
                             for(item in brandPopupMsg.msg){
                                 brandPopupMsg.msg[item]="";
@@ -823,6 +832,7 @@ window.onload=function() {
                             })
                      }
                      if(whichLayer=="界碑"){
+                        initializ(boundaryPopupMsg.msg)
                         var url="/selectBoundaryList/"+spid;
                         for(item in boundaryPopupMsg.msg){
                             boundaryPopupMsg.msg[item]="";
@@ -853,6 +863,7 @@ window.onload=function() {
                         })
                      }
                      if(whichLayer=="人为干扰"){
+                        initializ(manTroblePopupMsg.msg)
                         var url="/querySpreadSub/"+spid+"/"+subid;
                         $.get(url,function(data){
                             var troubleMsg=JSON.parse(data);
@@ -881,6 +892,7 @@ window.onload=function() {
                          });
                      }
                      if(whichLayer=="灾害监测"){
+                        initializ(disasterPopupMsg.msg);
                         var url="/queryDisasterSpreadSub/"+spid+"/"+subid;
                         console.log(url);
                         $.get(url,function(data){
@@ -906,6 +918,7 @@ window.onload=function() {
                          });
                      }
                      if(whichLayer=="生境点"){
+                        initializ(habitatPopupMsg.msg);
                         var urlTranslate="/obtainHabitat/"+spid+"/"+subid;
                         var url="/obtainHabitat/"+spid+"/"+subid;
                         $.get(url,function(data){
@@ -934,23 +947,26 @@ window.onload=function() {
                          });
                      }
                      if(whichLayer=="视频监控"){
+
                         var urlMsg="/selectVidicon/"+spid;
                         console.log(urlMsg);
                         $.get(urlMsg,function(data){
                             console.log(data);
                             if(JSON.parse(data).count>0) {
-                                var msgData = JSON.parse(data)[0];
+                                var msgData = JSON.parse(data).data[0];
                                 for(item in msgData){
                                     cameraPopupMsg.msg[item]=msgData[item]
                                 }
                             }
+
                             layer.open({
                                 type: 1,
                                 title: false,
                                 closeBtn: 0,
                                 shadeClose: true,
                                 skin: 'yourclass',
-                                content: $("#camera-popMsg")
+                                content: $("#camera-popMsg"),
+                                end:function(){   initializ(cameraPopupMsg.msg);}
                             });
                         })
                          $("#cameraPopupSave").unbind("click").click(function(){
@@ -960,17 +976,10 @@ window.onload=function() {
                              $.get(urlChange,function (data) {
                                  console.log(data);
                              })
-                             layer.open({
-                                 type: 1,
-                                 title: false,
-                                 closeBtn: 0,
-                                 shadeClose: true,
-                                 skin: 'yourclass',
-                                 content: $("#quatrat-popMsg")
-                             });
                          })
                      }
                      if(whichLayer=="样地代码"){
+                        initializ(quadratPopupMsg.msg);
                           var urlMsg="/queryQuadratData/"+spid;
                           console.log(urlMsg);
                           $.get(urlMsg,function(data){
@@ -1000,6 +1009,8 @@ window.onload=function() {
                      }
                 }
                 if(event.action.id==="popup-delete-msg"){
+                       var ifConfirm=confirm("是否确认删除此要素");
+                      if(!ifConfirm) return;
                        var getKey=$(".esri-feature__field-header");
                        var attributeObj={};
                        var layerSymbol; var deleteForUrl;var layerId;
@@ -1436,12 +1447,7 @@ window.onload=function() {
                 }
             });
             // 要素新增
-            // 初始化数据
-             var initializ=function(data){
-                 for(item in data){
-                     data[item]="";
-                 }
-             }
+
             $("#addFeature").click(function(){
                 if(!(userLogin=="superUser")) {alert("只有超级用户才能增加要素");return}
                 if(toolData.addLng=="") {alert("请先点击地图确定要添加的要素的坐标");return}

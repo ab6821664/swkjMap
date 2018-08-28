@@ -29,9 +29,9 @@ public class CameraContorller {
         //根据id查询摄像机属性
         @RequestMapping("/selectVidicon/{CameraId}")
         public String selectVidicon(@PathVariable("CameraId") String CameraId){
-            String substring = CameraId.substring(1);
+            //String substring = CameraId.substring(1);
             //将传进来的CameraId转换成Integer类型
-            Integer anInt = Integer.parseInt(substring);
+            Integer anInt = Integer.parseInt(CameraId);
             return ShiroConfiguration.getjson(cameraService.selectCamera(anInt),null);
         }
         //根据id修改摄像机属性
